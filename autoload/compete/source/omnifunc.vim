@@ -22,8 +22,9 @@ function! s:complete(context, callback) abort
     let l:start = call(&omnifunc, [1, ''])
     let l:base = strpart(getline('.'), l:start, col('.') - l:start)
     let l:result = call(&omnifunc, [0, l:base])
+    let l:result = type(l:result) == type([]) ? l:result : get(l:result, 'words', [])
     call a:callback({
-    \   'items': map(get(l:result, 'words', []), function('s:normalize_item'))
+    \   'items': map(copy(l:result), function('s:normalize_item'))
     \ })
   catch /.*/
     call a:context.abort()
@@ -38,6 +39,5 @@ function! s:normalize_item(idx, item) abort
     return { 'word': a:item }
   endif
   return a:item
-  
 endfunction
 
